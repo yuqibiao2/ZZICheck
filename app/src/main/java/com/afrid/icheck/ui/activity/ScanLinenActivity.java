@@ -119,7 +119,7 @@ public class ScanLinenActivity extends MyBaseActivity {
     public void stopScan(View view) {
 
         //TODO 删除
-        /*tagIdSet.add("E280117020001295464A0912");
+/*     tagIdSet.add("E280117020001295464A0912");
         tagIdSet.add("E28011702000052F46410912");
         tagIdSet.add("E2806890200000001F11B6E9");
         tagIdSet.add("E2806890200000001F1257AE");

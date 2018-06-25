@@ -31,7 +31,7 @@ public abstract class MyBaseActivity extends BaseActivity{
     @Override
     public void beforeInit() {
         super.beforeInit();
-        type = Type.UNIFORM;
+        type = Type.COMMON;
         mUnbind = ButterKnife.bind(this);
     }
 

@@ -309,6 +309,7 @@ public class ReceiptActivity extends MyBaseActivity {
             requestDataBean.setReceiptWarehouseId(hospitalId);//医院ID
             requestDataBean.setSenderWarehouseId(washFactoryId);//库房ID
             requestDataBean.setOfficeId(officeId + "");//科室ID
+            requestDataBean.setOrderType(1);//收脏
             requestDataBean.setSubReceiptList(resultData.getMIxTagLinenList());
             saveReceiptRequest.setRequestData(requestDataBean);
 

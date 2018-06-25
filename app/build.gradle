@@ -7,7 +7,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.0"
     defaultConfig {
-        applicationId "com.afrid.icheck.emp"
+        applicationId "com.afrid.icheck"  /*com.afrid.icheck.emp*/
         minSdkVersion 15
         targetSdkVersion 21
         versionCode 1

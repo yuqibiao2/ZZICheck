@@ -31,6 +31,7 @@ public class SaveReceiptRequest {
         private int senderWarehouseId;//医院Id
         private int receiptWarehouseId;//仓库Id
         private String officeId;//科室ID
+        private Integer orderType;//1：收脏 2：发净 3：盘点
         private int linenNum;
         private List<SubReceiptListBean> subReceiptList;
 
@@ -88,6 +89,14 @@ public class SaveReceiptRequest {
 
         public void setOfficeId(String officeId) {
             this.officeId = officeId;
+        }
+
+        public Integer getOrderType() {
+            return orderType;
+        }
+
+        public void setOrderType(Integer orderType) {
+            this.orderType = orderType;
         }
     }
 }
