@@ -32,6 +32,7 @@ public class SaveReceiptRequest {
         private int receiptWarehouseId;//仓库Id
         private String officeId;//科室ID
         private Integer orderType;//1：收脏 2：发净 3：盘点
+        private Integer washType;//1：布草 2：工服
         private int linenNum;
         private List<SubReceiptListBean> subReceiptList;
 
@@ -97,6 +98,14 @@ public class SaveReceiptRequest {
 
         public void setOrderType(Integer orderType) {
             this.orderType = orderType;
+        }
+
+        public Integer getWashType() {
+            return washType;
+        }
+
+        public void setWashType(Integer washType) {
+            this.washType = washType;
         }
     }
 }

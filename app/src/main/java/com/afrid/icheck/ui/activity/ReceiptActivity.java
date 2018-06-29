@@ -310,6 +310,14 @@ public class ReceiptActivity extends MyBaseActivity {
             requestDataBean.setSenderWarehouseId(washFactoryId);//库房ID
             requestDataBean.setOfficeId(officeId + "");//科室ID
             requestDataBean.setOrderType(1);//收脏
+            switch (type){
+                case COMMON:
+                    requestDataBean.setWashType(1);
+                    break;
+                case UNIFORM:
+                    requestDataBean.setWashType(2);
+                    break;
+            }
             requestDataBean.setSubReceiptList(resultData.getMIxTagLinenList());
             saveReceiptRequest.setRequestData(requestDataBean);
 
