@@ -38,6 +38,9 @@
         <activity android:name="com.afrid.icheck.ui.activity.ReceiptActivity" />
         <activity android:name="com.afrid.icheck.ui.activity.BTDeviceScanActivity"/>
         <activity android:name=".ui.activity.WashFactoryChoiceActivity"/>
+        <activity android:name=".ui.activity.UndoReceiptShowActivity">
+
+        </activity>
     </application>
 
 </manifest>

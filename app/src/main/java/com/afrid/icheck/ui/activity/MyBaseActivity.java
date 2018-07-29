@@ -21,17 +21,25 @@ public abstract class MyBaseActivity extends BaseActivity{
 
     private Unbinder mUnbind;
 
-    public Type type;
+    public Type type;//类型 ： 布草  工服
+
+    public OrderType orderType;
 
     public enum Type {
-        COMMON,
+        LINEN,
         UNIFORM
+    }
+
+    public enum OrderType{
+        RECEIVE,
+        SEND,
     }
 
     @Override
     public void beforeInit() {
         super.beforeInit();
-        type = Type.COMMON;
+        type = Type.LINEN;
+        orderType = OrderType.SEND;
         mUnbind = ButterKnife.bind(this);
     }
 

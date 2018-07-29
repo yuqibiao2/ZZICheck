@@ -23,7 +23,7 @@ public class APIFactory {
 
 
     //--正式
-    public static final String BASE_URL="http://47.100.100.217:8080/zz/";
+    public static final String BASE_URL="http://47.100.100.217:8080/zhengzhou/";
     //--本地测试
     //public static final String BASE_URL="http://192.168.199.130:8080/zz/";
     //云端测试库

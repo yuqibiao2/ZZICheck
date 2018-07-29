@@ -26,6 +26,8 @@ import com.afrid.icheck.bean.json.GetTagInfoRequest;
 import com.afrid.icheck.bean.json.SaveReceiptRequest;
 import com.afrid.icheck.bean.json.return_data.GetEmpUniformReturn;
 import com.afrid.icheck.bean.json.return_data.GetTagInfoListReturn;
+import com.afrid.icheck.bean.json.return_data.GetUndoReceiptReturn;
+import com.afrid.icheck.global.Constant;
 import com.afrid.icheck.net.APIMethodManager;
 import com.afrid.icheck.net.IRequestCallback;
 import com.afrid.icheck.utils.PrintStrBuildUtils;
@@ -35,6 +37,7 @@ import com.yyyu.baselibrary.utils.MyToast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 import rx.Subscription;
@@ -79,7 +82,6 @@ public class ReceiptActivity extends MyBaseActivity {
     private String checkHospitalName;
 
 
-
     @Override
     public void beforeInit() {
         super.beforeInit();
@@ -87,15 +89,15 @@ public class ReceiptActivity extends MyBaseActivity {
         zkcManager.bindService();
         apiMethodManager = APIMethodManager.getInstance();
         application = (MyApplication) getApplication();
+        getTagInfoRequest = getIntent().getStringExtra("getTagInfoRequest");
+        officeName = application.getCheckOfficeName();//getIntent().getStringExtra("officeName");
+        hospitalId = ((MyApplication) getApplication()).getCheckHospitalId();
+        checkHospitalName = ((MyApplication) getApplication()).getCheckHospitalName();
+        officeId = ((MyApplication) getApplication()).getCheckOfficeId();
     }
 
     @Override
     public int getLayoutId() {
-        getTagInfoRequest = getIntent().getStringExtra("getTagInfoRequest");
-        officeName = getIntent().getStringExtra("officeName");
-        hospitalId = ((MyApplication) getApplication()).getCheckHospitalId();
-        checkHospitalName = ((MyApplication) getApplication()).getCheckHospitalName();
-        officeId = ((MyApplication) getApplication()).getCheckOfficeId();
         return R.layout.activity_receipt;
     }
 
@@ -107,7 +109,7 @@ public class ReceiptActivity extends MyBaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);*/
         rv_office.setLayoutManager(new LinearLayoutManager(this));
         switch (type) {
-            case COMMON:
+            case LINEN:
                 adapter = new LinenAdapter(this);
                 rv_office.setAdapter(adapter);
                 break;
@@ -129,7 +131,7 @@ public class ReceiptActivity extends MyBaseActivity {
         super.initData();
         showLoadDialog(resourceUtils.getStr(R.string.data_loading));
         switch (type) {
-            case COMMON:
+            case LINEN:
                 tagInfoListSubscription = apiMethodManager.getTagInfoList(getTagInfoRequest, new IRequestCallback<GetTagInfoListReturn>() {
                     @Override
                     public void onSuccess(GetTagInfoListReturn result) {
@@ -155,7 +157,7 @@ public class ReceiptActivity extends MyBaseActivity {
                 List<String> tagList = infoRequest.getRequestData().getTagList();
                 final BaseJsonRequest<List<String>> request = new BaseJsonRequest<>();
                 request.setRequestData(tagList);
-                tagInfoListSubscription = apiMethodManager.getTagInfoList(getTagInfoRequest, new IRequestCallback<GetTagInfoListReturn>() {
+                tagInfoListSubscription = apiMethodManager.getUniformTagInfoList(getTagInfoRequest, new IRequestCallback<GetTagInfoListReturn>() {
                     @Override
                     public void onSuccess(GetTagInfoListReturn result) {
                         int resultCode = result.getResultCode();
@@ -193,11 +195,11 @@ public class ReceiptActivity extends MyBaseActivity {
                         String empName;
                         int officeId1 = bean.getOfficeId();
                         int officeId2 = officeId;
-                        if (officeId1!=officeId2){
+                        if (officeId1 != officeId2) {
                             String officeName = bean.getOfficeName();
-                            empName = bean.getEmpName()+"("+officeName+")";
+                            empName = bean.getEmpName() + "(" + officeName + ")";
                             bean.setEmpName(empName);
-                        }else{
+                        } else {
                             empName = bean.getEmpName();
                         }
                         String empNo = bean.getEmpNo();
@@ -208,10 +210,10 @@ public class ReceiptActivity extends MyBaseActivity {
                             List<Uniform> newUniformList = new ArrayList<Uniform>();
 
                             Uniform uniform = existEmpName(uniforms, uniformTypeName);
-                            if(uniform!=null){//相同的员工名存在相同的名称
+                            if (uniform != null) {//相同的员工名存在相同的名称
                                 Integer num = uniform.getNum();
                                 uniform.setNum(++num);
-                            }else{
+                            } else {
                                 Uniform uniform2 = new Uniform();
                                 uniform2.setName(uniformTypeName);
                                 uniform2.setNum(1);
@@ -237,7 +239,7 @@ public class ReceiptActivity extends MyBaseActivity {
                         StringBuilder sbInfo = new StringBuilder();
                         for (Uniform uniform : uniforms) {
                             sbInfo.append(uniform.getName());
-                            for (int i=10 ; i>uniform.getName().length() ; i--){
+                            for (int i = 10; i > uniform.getName().length(); i--) {
                                 sbInfo.append("　");
                             }
                             sbInfo.append("x " + uniform.getNum());
@@ -261,7 +263,7 @@ public class ReceiptActivity extends MyBaseActivity {
         });
     }
 
-    public Uniform existEmpName(List<Uniform> uniforms , String  uniformTypeName){
+    public Uniform existEmpName(List<Uniform> uniforms, String uniformTypeName) {
         for (Uniform uniform : uniforms) {
             if (uniformTypeName.equals(uniform.getName())) {//相同的员工名存在相同的名称
                 return uniform;
@@ -290,6 +292,36 @@ public class ReceiptActivity extends MyBaseActivity {
      * @param view
      */
     public void saveReceipt(View view) {
+        // 验证发净数量
+        if (orderType == OrderType.SEND) {
+            List<SubReceiptListBean> mIxTagLinenList = resultData.getMIxTagLinenList();
+            GetUndoReceiptReturn.ResultDataBean checkedUndoReceipt = Constant.checkedUndoReceipt;
+            List<GetUndoReceiptReturn.ResultDataBean.SubReceiptListBean> subReceiptList = checkedUndoReceipt.getSubReceiptList();
+
+            Map<Integer, Integer> con1 = new HashMap<>();
+            Map<Integer, Integer> con2 = new HashMap<>();
+            for (SubReceiptListBean bean : mIxTagLinenList) {
+                int tagTypeId = bean.getTagTypeId();
+                int tagNum = bean.getTagNum();
+                con2.put(tagTypeId, tagNum);
+            }
+
+            for (GetUndoReceiptReturn.ResultDataBean.SubReceiptListBean subReceiptListBean : subReceiptList) {
+                int linenId = subReceiptListBean.getLinenId();
+                int linenCount = subReceiptListBean.getLinenCount();
+                con1.put(linenId, linenCount);
+            }
+            boolean isLeagal = true;
+            for (Integer key : con1.keySet()) {
+                if (!con2.containsKey(key) || con1.get(key).intValue() != con2.get(key)) {
+                    isLeagal = false;
+                }
+            }
+            if (!isLeagal) {
+                MyToast.showLong(ReceiptActivity.this, "数量不对 请核实后再提交");
+                return;
+            }
+        }
         btn_submit.setEnabled(false);
         WashFactoryChoiceActivity.startActionForResult(this);
     }
@@ -306,23 +338,39 @@ public class ReceiptActivity extends MyBaseActivity {
             requestDataBean.setUserId(application.getUser_id());
             requestDataBean.setReaderId(application.getCurrentReaderId());
             requestDataBean.setLinenNum(resultData.getVaildTagNum());//设置有效标签总数
-            requestDataBean.setReceiptWarehouseId(hospitalId);//医院ID
-            requestDataBean.setSenderWarehouseId(washFactoryId);//库房ID
             requestDataBean.setOfficeId(officeId + "");//科室ID
-            requestDataBean.setOrderType(1);//收脏
-            switch (type){
-                case COMMON:
+            switch (orderType){
+                case RECEIVE:
+                    requestDataBean.setOrderType(1);//收脏
+                    requestDataBean.setReceiptWarehouseId(hospitalId);//医院ID
+                    requestDataBean.setSenderWarehouseId(washFactoryId);//库房ID
+                    break;
+                case SEND:
+                    requestDataBean.setOrderType(2);//发净
+                    requestDataBean.setReceiptWarehouseId(washFactoryId);//医院ID
+                    requestDataBean.setSenderWarehouseId(hospitalId);//库房ID
+                    break;
+            }
+            switch (type) {
+                case LINEN:
                     requestDataBean.setWashType(1);
                     break;
                 case UNIFORM:
                     requestDataBean.setWashType(2);
                     break;
             }
+            switch (orderType) {
+                case RECEIVE:
+                    break;
+                case SEND:
+                    requestDataBean.setReceiveMainId(Constant.checkedUndoReceipt.getMainId());
+                    break;
+            }
             requestDataBean.setSubReceiptList(resultData.getMIxTagLinenList());
             saveReceiptRequest.setRequestData(requestDataBean);
 
             String request = mGson.toJson(saveReceiptRequest);
-            saveReceiptSubscription = apiMethodManager.saveReceipt(request, new IRequestCallback<BaseJsonResult<String>>() {
+            saveReceiptSubscription = apiMethodManager.saveReceipt(request, orderType, new IRequestCallback<BaseJsonResult<String>>() {
                 @Override
                 public void onSuccess(BaseJsonResult<String> result) {
                     int resultCode = result.getResultCode();
@@ -343,16 +391,16 @@ public class ReceiptActivity extends MyBaseActivity {
                                 .setPositiveButton(resourceUtils.getStr(R.string.receipt_alter_pos), new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
-                                        switch (type){
-                                            case COMMON:{
+                                        switch (type) {
+                                            case LINEN: {
                                                 String printStr = PrintStrBuildUtils.buildReceipt(ReceiptActivity.this, true, application.getUser_name(),
                                                         officeName, washFactoryName, mainId, ReceiptActivity.this.resultData.getMIxTagLinenList());
                                                 zkcManager.getPrintManager().printText(printStr);
                                                 break;
                                             }
-                                            case UNIFORM:{
+                                            case UNIFORM: {
                                                 String printStr = PrintStrBuildUtils.buildReceipt2(ReceiptActivity.this, true, application.getUser_name(),
-                                                        checkHospitalName, washFactoryName, officeName,mainId, conMap);
+                                                        checkHospitalName, washFactoryName, officeName, mainId, conMap);
                                                 zkcManager.getPrintManager().printText(printStr);
                                                 break;
                                             }
@@ -361,16 +409,16 @@ public class ReceiptActivity extends MyBaseActivity {
                                 })
                                 .create();
                         alertDialog.show();
-                        switch (type){
-                            case COMMON:{
+                        switch (type) {
+                            case LINEN: {
                                 String printStr = PrintStrBuildUtils.buildReceipt(ReceiptActivity.this, false, application.getUser_name(),
                                         officeName, washFactoryName, mainId, ReceiptActivity.this.resultData.getMIxTagLinenList());
                                 zkcManager.getPrintManager().printText(printStr);
                                 break;
                             }
-                            case UNIFORM:{
+                            case UNIFORM: {
                                 String printStr = PrintStrBuildUtils.buildReceipt2(ReceiptActivity.this, false, application.getUser_name(),
-                                        checkHospitalName, washFactoryName, officeName,mainId, conMap);
+                                        checkHospitalName, washFactoryName, officeName, mainId, conMap);
                                 zkcManager.getPrintManager().printText(printStr);
                                 break;
                             }

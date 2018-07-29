@@ -1,5 +1,7 @@
 package com.afrid.icheck.global;
 
+import com.afrid.icheck.bean.json.return_data.GetUndoReceiptReturn;
+
 /**
  * 功能：常量
  *
@@ -11,5 +13,7 @@ package com.afrid.icheck.global;
 public class Constant {
 
     public static final String USER_INFO = "USER_INFO";
+
+    public static GetUndoReceiptReturn.ResultDataBean checkedUndoReceipt;
 
 }

@@ -34,6 +34,9 @@ import butterknife.BindView;
 
 public class MainActivity extends MyBaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+
+    @BindView(R.id.tv_show_undo)
+    TextView tvShowUndo;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.content_main)
@@ -65,7 +68,12 @@ public class MainActivity extends MyBaseActivity implements NavigationView.OnNav
 
     @Override
     protected void initListener() {
-
+        tvShowUndo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UndoReceiptShowActivity.startAction(MainActivity.this);
+            }
+        });
     }
 
     @Override

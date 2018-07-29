@@ -33,8 +33,17 @@ public class SaveReceiptRequest {
         private String officeId;//科室ID
         private Integer orderType;//1：收脏 2：发净 3：盘点
         private Integer washType;//1：布草 2：工服
+        private String receiveMainId;//发净时才设置
         private int linenNum;
         private List<SubReceiptListBean> subReceiptList;
+
+        public String getReceiveMainId() {
+            return receiveMainId;
+        }
+
+        public void setReceiveMainId(String receiveMainId) {
+            this.receiveMainId = receiveMainId;
+        }
 
         public String getReaderId() {
             return readerId;
@@ -108,4 +117,5 @@ public class SaveReceiptRequest {
             this.washType = washType;
         }
     }
+
 }

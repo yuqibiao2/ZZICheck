@@ -2,6 +2,7 @@
 package com.afrid.icheck.ui.activity;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -64,7 +65,7 @@ public class ScanLinenActivity extends MyBaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);*/
 
         Intent intent = getIntent();
-        officeName = intent.getStringExtra("officeName");
+        officeName = application.getCheckOfficeName();//intent.getStringExtra("officeName");
         tv_warehouse.setText(officeName);
     }
 
@@ -119,13 +120,15 @@ public class ScanLinenActivity extends MyBaseActivity {
     public void stopScan(View view) {
 
         //TODO 删除
-/*     tagIdSet.add("E280117020001295464A0912");
-        tagIdSet.add("E28011702000052F46410912");
-        tagIdSet.add("E2806890200000001F11B6E9");
+/*
+     tagIdSet.add("E280117020001295464A0912");
+        tagIdSet.add("E2806890200000001F135630");
+        tagIdSet.add("E2806890200000001F11AE5A");
         tagIdSet.add("E2806890200000001F1257AE");
         tagIdSet.add("E2806890200000001F11C00D");
-        tagIdSet.add("E280117020001555467E0912");
-        tagIdSet.add("E2801170200002F046560912");*/
+        tagIdSet.add("E2806810200000040D0174F7");
+        tagIdSet.add("E2801170200002F046560912");
+*/
 
         wvScan.stop();
         swingUManager.stopReader();
@@ -155,13 +158,13 @@ public class ScanLinenActivity extends MyBaseActivity {
     /**
      * 页面跳转
      *
-     * @param activity
+     * @param context
      * @param officeName 科室
      */
-    public static void startAction(Activity activity, String officeName) {
-        Intent intent = new Intent(activity, ScanLinenActivity.class);
+    public static void startAction(Context context, String officeName) {
+        Intent intent = new Intent(context, ScanLinenActivity.class);
         intent.putExtra("officeName", officeName);
-        activity.startActivity(intent);
+        context.startActivity(intent);
     }
 
 }

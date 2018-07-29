@@ -17,6 +17,12 @@ public class MyTimeUtils {
         return sdf.format(currentdate);
     }
 
+    public static String  formatDate(String pattern ,  long date){
+        Date date1 = new Date(date);
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        return sdf.format(date1);
+    }
+
 
     /**
      * 补全十位数（针对时、分）

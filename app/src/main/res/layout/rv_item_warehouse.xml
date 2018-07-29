@@ -10,7 +10,7 @@
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
     app:cardCornerRadius="2dp"
-    app:cardElevation="3dp">>
+    app:cardElevation="3dp">
 
     <TextView
         android:id="@+id/tv_dept_name"

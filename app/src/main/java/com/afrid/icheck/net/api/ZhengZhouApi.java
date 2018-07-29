@@ -5,6 +5,7 @@ import com.afrid.icheck.bean.json.return_data.GetEmpUniformReturn;
 import com.afrid.icheck.bean.json.return_data.GetHospitalReturn;
 import com.afrid.icheck.bean.json.return_data.GetOfficeReturn;
 import com.afrid.icheck.bean.json.return_data.GetTagInfoListReturn;
+import com.afrid.icheck.bean.json.return_data.GetUndoReceiptReturn;
 import com.afrid.icheck.bean.json.return_data.GetWarehouseReturn;
 import com.afrid.icheck.bean.json.return_data.GetWashFactoryReturn;
 import com.afrid.icheck.bean.json.return_data.LoginReturn;
@@ -26,6 +27,9 @@ import rx.Observable;
 
 public interface ZhengZhouApi {
 
+    @POST("receipt/wrapper/v1/getUndoReceipt")
+    Observable<GetUndoReceiptReturn> getUndoReceipt(@Body RequestBody requestBody);
+
     @GET("empUniform/v1/getEmpHospital")
     Observable<GetHospitalReturn> getEmpHospital();
 
@@ -41,8 +45,14 @@ public interface ZhengZhouApi {
     @GET("office/v1/getOfficeByOfficeSuper/{hospitalId}")
     Observable<GetOfficeReturn> getOfficeByHospitalId(@Path("hospitalId") Integer hospitalId);
 
+    @POST("receipt/wrapper/v1/receive/saveReceipt")
+    Observable<BaseJsonResult<String>> saveReceiveReceipt(@Body RequestBody requestBody);
+
     @POST("receipt/wrapper/v1/saveReceipt")
     Observable<BaseJsonResult<String>> saveReceipt(@Body RequestBody requestBody);
+
+    @POST("empUniform/v1/getUniformTagInfoList")
+    Observable<GetTagInfoListReturn> getUniformTagInfoList(@Body RequestBody requestBody);
 
     @POST("tag/v1/getTagInfoList")
     Observable<GetTagInfoListReturn> getTagInfoList(@Body RequestBody requestBody);

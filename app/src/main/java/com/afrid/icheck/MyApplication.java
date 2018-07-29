@@ -2,6 +2,8 @@ package com.afrid.icheck;
 
 import android.app.Application;
 
+import com.afrid.icheck.bean.json.return_data.GetUndoReceiptReturn;
+
 import java.util.List;
 
 /**
@@ -20,6 +22,7 @@ public class MyApplication extends Application{
     private String currentReaderId;
     private int checkWarehouseId;
     private int checkOfficeId;
+    private String checkOfficeName;
     private int checkHospitalId;
     private String checkHospitalName;
 
@@ -74,6 +77,14 @@ public class MyApplication extends Application{
 
     public void setCheckOfficeId(int checkOfficeId) {
         this.checkOfficeId = checkOfficeId;
+    }
+
+    public String getCheckOfficeName() {
+        return checkOfficeName;
+    }
+
+    public void setCheckOfficeName(String checkOfficeName) {
+        this.checkOfficeName = checkOfficeName;
     }
 
     public int getCheckHospitalId() {

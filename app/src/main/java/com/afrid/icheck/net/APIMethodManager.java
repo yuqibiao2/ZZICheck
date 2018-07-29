@@ -1,14 +1,18 @@
 package com.afrid.icheck.net;
 
 import com.afrid.icheck.bean.json.BaseJsonResult;
+import com.afrid.icheck.bean.json.GetUndoReceiptRequest;
 import com.afrid.icheck.bean.json.return_data.GetEmpUniformReturn;
 import com.afrid.icheck.bean.json.return_data.GetHospitalReturn;
 import com.afrid.icheck.bean.json.return_data.GetOfficeReturn;
 import com.afrid.icheck.bean.json.return_data.GetTagInfoListReturn;
+import com.afrid.icheck.bean.json.return_data.GetUndoReceiptReturn;
 import com.afrid.icheck.bean.json.return_data.GetWarehouseReturn;
 import com.afrid.icheck.bean.json.return_data.GetWashFactoryReturn;
 import com.afrid.icheck.bean.json.return_data.LoginReturn;
 import com.afrid.icheck.net.api.ZhengZhouApi;
+import com.afrid.icheck.ui.activity.MyBaseActivity;
+import com.google.gson.Gson;
 import com.yyyu.baselibrary.utils.MyLog;
 
 import okhttp3.RequestBody;
@@ -44,13 +48,47 @@ public class APIMethodManager {
     }
 
     /**
+     * 得到未完成的订单
+     *
+     * @param request
+     * @param callback
+     * @return
+     */
+    public Subscription getUndoReceipt(GetUndoReceiptRequest request, final IRequestCallback<GetUndoReceiptReturn> callback) {
+
+        String requestJson = new Gson().toJson(request);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), requestJson);
+        Subscription subscribe = kunmingApi.getUndoReceipt(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GetUndoReceiptReturn>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFailure(e);
+                    }
+
+                    @Override
+                    public void onNext(GetUndoReceiptReturn getUndoReceiptReturn) {
+                        callback.onSuccess(getUndoReceiptReturn);
+                    }
+                });
+
+        return subscribe;
+    }
+
+    /**
      * 得到工服信息
      *
      * @param request
      * @param callback
      * @return
      */
-    public Subscription getetEmpUniformList(String request, final IRequestCallback<GetEmpUniformReturn> callback){
+    public Subscription getetEmpUniformList(String request, final IRequestCallback<GetEmpUniformReturn> callback) {
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request);
         Subscription subscribe = kunmingApi.getetEmpUniformList(body)
                 .subscribeOn(Schedulers.io())
@@ -81,7 +119,7 @@ public class APIMethodManager {
      * @param callback
      * @return
      */
-    public Subscription getEmpHospital(final IRequestCallback<GetHospitalReturn> callback){
+    public Subscription getEmpHospital(final IRequestCallback<GetHospitalReturn> callback) {
 
         Subscription subscribe = kunmingApi.getEmpHospital()
                 .subscribeOn(Schedulers.io())
@@ -112,7 +150,7 @@ public class APIMethodManager {
      * @param callback
      * @return
      */
-    public Subscription getEmpOfficeByHospitalNo(String hospitalNo , final IRequestCallback<GetOfficeReturn> callback){
+    public Subscription getEmpOfficeByHospitalNo(String hospitalNo, final IRequestCallback<GetOfficeReturn> callback) {
         Subscription subscribe = kunmingApi.getEmpOfficeByHospitalNo(hospitalNo)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -143,7 +181,7 @@ public class APIMethodManager {
      * @param callback
      * @return
      */
-    public Subscription getHospitalByUserId(Integer userId , final IRequestCallback<GetHospitalReturn> callback){
+    public Subscription getHospitalByUserId(Integer userId, final IRequestCallback<GetHospitalReturn> callback) {
 
         Subscription subscribe = kunmingApi.getHospitalByUserId(userId)
                 .subscribeOn(Schedulers.io())
@@ -175,7 +213,7 @@ public class APIMethodManager {
      * @param callback
      * @return
      */
-    public Subscription getOfficeByHospitalId(Integer hospitalId , final IRequestCallback<GetOfficeReturn> callback){
+    public Subscription getOfficeByHospitalId(Integer hospitalId, final IRequestCallback<GetOfficeReturn> callback) {
         Subscription subscribe = kunmingApi.getOfficeByHospitalId(hospitalId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -199,15 +237,14 @@ public class APIMethodManager {
     }
 
     /**
-     * 保存收据
+     * 保存收据（发净）
      *
      * @param request  SaveReceiptRequest对应的json
      * @param callback
      */
-    public Subscription saveReceipt(String request, final IRequestCallback<BaseJsonResult<String>> callback) {
-        MyLog.e("request===" + request);
+    public Subscription saveReceiveReceipt(String request, final IRequestCallback<BaseJsonResult<String>> callback) {
         RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request);
-        Subscription subscribe = kunmingApi.saveReceipt(body)
+        Subscription subscribe = kunmingApi.saveReceiveReceipt(body)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<BaseJsonResult<String>>() {
@@ -224,6 +261,97 @@ public class APIMethodManager {
                     @Override
                     public void onNext(BaseJsonResult<String> baseJsonResult) {
                         callback.onSuccess(baseJsonResult);
+                    }
+                });
+        return subscribe;
+    }
+
+    /**
+     * 保存收据
+     *
+     * @param request  SaveReceiptRequest对应的json
+     * @param callback
+     */
+    public Subscription saveReceipt(String request, MyBaseActivity.OrderType orderType, final IRequestCallback<BaseJsonResult<String>> callback ) {
+        MyLog.e("request===" + request);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request);
+        Subscription subscribe = null;
+        switch (orderType){
+            case RECEIVE:{
+                subscribe = kunmingApi.saveReceipt(body)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<BaseJsonResult<String>>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                callback.onFailure(e);
+                            }
+
+                            @Override
+                            public void onNext(BaseJsonResult<String> baseJsonResult) {
+                                callback.onSuccess(baseJsonResult);
+                            }
+                        });
+                break;
+            }
+            case SEND:{
+                subscribe = kunmingApi.saveReceiveReceipt(body)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<BaseJsonResult<String>>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                callback.onFailure(e);
+                            }
+
+                            @Override
+                            public void onNext(BaseJsonResult<String> baseJsonResult) {
+                                callback.onSuccess(baseJsonResult);
+                            }
+                        });
+                break;
+            }
+        }
+
+        return subscribe;
+    }
+
+    /**
+     * 得到工服标签的信息
+     *
+     * @param request  GetTagInfoRequest对应的json
+     * @param callback
+     */
+    public Subscription getUniformTagInfoList(String request, final IRequestCallback<GetTagInfoListReturn> callback) {
+        MyLog.e("request===" + request);
+        RequestBody body = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), request);
+        Subscription subscribe = kunmingApi.getUniformTagInfoList(body)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GetTagInfoListReturn>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        callback.onFailure(e);
+                    }
+
+                    @Override
+                    public void onNext(GetTagInfoListReturn getTagInfoListReturn) {
+                        callback.onSuccess(getTagInfoListReturn);
                     }
                 });
         return subscribe;

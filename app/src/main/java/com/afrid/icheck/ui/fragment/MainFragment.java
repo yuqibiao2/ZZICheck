@@ -15,15 +15,13 @@ import com.afrid.icheck.bean.json.return_data.GetHospitalReturn;
 import com.afrid.icheck.bean.json.return_data.GetOfficeReturn;
 import com.afrid.icheck.net.APIMethodManager;
 import com.afrid.icheck.net.IRequestCallback;
-import com.afrid.icheck.ui.activity.BTDeviceScanActivity;
 import com.afrid.icheck.ui.activity.MyBaseActivity;
 import com.afrid.icheck.ui.activity.ScanLinenActivity;
-import com.afrid.swingu.utils.SwingUManager;
+import com.afrid.icheck.ui.activity.UndoReceiptShowActivity;
 import com.yyyu.baselibrary.utils.MyLog;
 import com.yyyu.baselibrary.utils.MyToast;
 import com.yyyu.baselibrary.view.recyclerview.listener.OnRvItemClickListener;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +53,7 @@ public class MainFragment extends MyBaseFragment {
     private Subscription subscription;
     private List<GetOfficeReturn.ResultDataBean> officeList;
     private MyBaseActivity.Type type;
+    private MyBaseActivity.OrderType orderType;
 
     @Override
     public int getLayoutId() {
@@ -68,6 +67,7 @@ public class MainFragment extends MyBaseFragment {
         application = (MyApplication) getActivity().getApplication();
         apiMethodManager = APIMethodManager.getInstance();
         type = ((MyBaseActivity) getActivity()).type;
+        orderType = ((MyBaseActivity) getActivity()).orderType;
     }
 
     @Override
@@ -125,7 +125,15 @@ public class MainFragment extends MyBaseFragment {
                     return;
                 }*/
                 application.setCheckOfficeId(officeList.get(position).getOfficeId());
-                ScanLinenActivity.startAction(getActivity(), officeList.get(position).getOfficeName());
+                application.setCheckOfficeName(officeList.get(position).getOfficeName());
+                switch (orderType){
+                    case RECEIVE:
+                        ScanLinenActivity.startAction(getActivity(), officeList.get(position).getOfficeName());
+                        break;
+                    case SEND:
+                        UndoReceiptShowActivity.startAction(getContext());
+                        break;
+                }
             }
 
             @Override
@@ -208,7 +216,7 @@ public class MainFragment extends MyBaseFragment {
                 });
                 break;
             }
-            case COMMON:{
+            case LINEN:{
                 subscription = apiMethodManager.getHospitalByUserId(application.getUser_id(), new IRequestCallback<GetHospitalReturn>() {
                     @Override
                     public void onSuccess(GetHospitalReturn result) {
@@ -269,7 +277,7 @@ public class MainFragment extends MyBaseFragment {
                 });
                 break;
             }
-            case COMMON:{
+            case LINEN:{
                 apiMethodManager.getOfficeByHospitalId(hospital.getHospitalId(), new IRequestCallback<GetOfficeReturn>() {
                     @Override
                     public void onSuccess(GetOfficeReturn result) {
